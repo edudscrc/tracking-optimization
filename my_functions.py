@@ -17,12 +17,13 @@ def m_imshow(data, title, xlabel, ylabel, xticks, yticks, filename, extent):
     plt.ylabel(ylabel)
     plt.xticks(xticks)
     plt.yticks(yticks)
-    plt.savefig(filename, dpi=300)
+    plt.savefig(f'./plots/{filename}', dpi=300)
+    
     plt.close('all')
 
 
 def m_plot(x_arr, data, title, xlabel, ylabel, xticks, filename):
-    plt.rcParams.update({'font.size': 6})
+    plt.rcParams.update({'font.size': 5})
 
     plt.figure(layout="constrained", dpi=300)
     plt.plot(x_arr, data, linewidth=0.5)
@@ -31,7 +32,8 @@ def m_plot(x_arr, data, title, xlabel, ylabel, xticks, filename):
     plt.xlabel(xlabel)
     plt.xticks(xticks)
     plt.grid(True)
-    plt.savefig(filename, dpi=300)
+    plt.savefig(f'./plots/{filename}', dpi=300)
+    plt.show()
     plt.close('all')
 
 
