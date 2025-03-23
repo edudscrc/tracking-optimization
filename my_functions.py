@@ -3,7 +3,7 @@ import numpy as np
 import re
 
 
-def m_imshow(data, title, xlabel, ylabel, xticks, yticks, filename, extent):
+def m_imshow(data, title, xlabel, ylabel, xticks, yticks, filename, extent, show):
     vmax = np.percentile(abs(data), 99.9)
     vmin = -vmax
 
@@ -17,12 +17,15 @@ def m_imshow(data, title, xlabel, ylabel, xticks, yticks, filename, extent):
     plt.ylabel(ylabel)
     plt.xticks(xticks)
     plt.yticks(yticks)
-    plt.savefig(f'./plots/{filename}', dpi=300)
+    plt.savefig(f'./plots_19000/{filename}', dpi=300)
     
+    if show:
+        plt.show()
+
     plt.close('all')
 
 
-def m_plot(x_arr, data, title, xlabel, ylabel, xticks, filename):
+def m_plot(x_arr, data, title, xlabel, ylabel, xticks, filename, show):
     plt.rcParams.update({'font.size': 5})
 
     plt.figure(layout="constrained", dpi=300)
@@ -32,8 +35,11 @@ def m_plot(x_arr, data, title, xlabel, ylabel, xticks, filename):
     plt.xlabel(xlabel)
     plt.xticks(xticks)
     plt.grid(True)
-    plt.savefig(f'./plots/{filename}', dpi=300)
-    plt.show()
+    plt.savefig(f'./plots_19000/{filename}', dpi=300)
+
+    if show:
+        plt.show()
+        
     plt.close('all')
 
 
