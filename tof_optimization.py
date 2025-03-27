@@ -4,7 +4,7 @@ from scipy.optimize import minimize
 
 
 def generate_delays(x_w, r_w, x_sensors):
-	c = 1440.
+	c = 1500.
 	return np.sqrt((x_w - x_sensors)**2 + r_w**2) / c
 
 
