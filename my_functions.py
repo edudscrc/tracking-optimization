@@ -17,7 +17,7 @@ def m_imshow(data, title, xlabel, ylabel, xticks, yticks, filename, extent, show
     plt.ylabel(ylabel)
     plt.xticks(xticks)
     plt.yticks(yticks)
-    plt.savefig(f'./plots_19000/{filename}', dpi=300)
+    plt.savefig(f'./plots/{filename}', dpi=300)
     
     if show:
         plt.show()
@@ -35,7 +35,7 @@ def m_plot(x_arr, data, title, xlabel, ylabel, xticks, filename, show):
     plt.xlabel(xlabel)
     plt.xticks(xticks)
     plt.grid(True)
-    plt.savefig(f'./plots_19000/{filename}', dpi=300)
+    plt.savefig(f'./plots/{filename}', dpi=300)
 
     if show:
         plt.show()

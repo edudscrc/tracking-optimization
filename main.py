@@ -4,17 +4,14 @@ import matplotlib.pyplot as plt
 from scipy.io.wavfile import write
 from my_functions import m_imshow, m_plot, load_data
 
-data, spatial_position_start, spatial_position_end, time_start, time_end = load_data('aquisicao_40km_50ns_21_10_2024_ds1_19000m_22500m_tds1_40730s_40745s_fs899Hz_bandpass_43Hz_85Hz_medfilt_47_4')
+data, spatial_position_start, spatial_position_end, time_start, time_end = load_data('aquisicao_40km_50ns_21_10_2024_ds1_19000m_26000m_tds1_3s_15s_fs899Hz_bandpass_30Hz_80Hz_medfilt_47_4')
 
 print(f'{data.shape = }')
 
 fs = 900
 
-# 19000
-apex = 7323
-
-# 27355
-# apex = 6865
+# O apex aqui é na verdade um referência
+# apex = 17410
 
 spatial_position_arr = np.linspace(spatial_position_start, spatial_position_end, data.shape[0])
 time_arr = np.linspace(time_start, time_end, data.shape[1])
@@ -29,7 +26,6 @@ extent = [time_arr.min(), time_arr.max(), spatial_position_arr.min(), spatial_po
 # plt.imshow(abs(data), aspect='auto', origin='lower', vmax=vmax, vmin=vmin)
 # plt.colorbar()
 # plt.show()
-# plt.close('all')
 
 # print('Plotting original matrix...')
 # m_imshow(data=data, title='No Beamforming', xlabel='Time [s]', ylabel='Spatial Position [m]', xticks=x_ticks, yticks=y_ticks, filename='no_beamforming.png', extent=extent, show=False)
@@ -43,12 +39,13 @@ extent = [time_arr.min(), time_arr.max(), spatial_position_arr.min(), spatial_po
 #     delays.append(corr_delay)
 #     print(f'Iteration {i}')
 # delays = np.asarray(delays)
-# np.save('./delays_19000_px.npy', delays)
+# np.save('./delays_px.npy', delays)
 
 # delays = np.load('./delays_px.npy')
 
-delays = np.load('synthetic_delays_19000_px.npy')
+delays = np.load('real_simulated_delays_seconds.npy')
 delays *= -1
+delays *= fs
 
 # delays_seconds = delays / fs
 # m_plot(x_arr=spatial_position_arr, data=delays_seconds, title='Real Delays', xlabel='Spatial Position [m]', ylabel='Time [s]', xticks=y_ticks, filename='delays_seconds.png', show=False)
@@ -60,7 +57,7 @@ for i in range(data.shape[0]):
 print('Plotting beamformed matrix...')
 m_imshow(data=data, title='Beamforming Applied', xlabel='Time [s]', ylabel='Spatial Position [m]', xticks=x_ticks, yticks=y_ticks, filename='beamforming_applied.png', extent=extent, show=False)
 
-# signal = np.mean(data[apex-100:apex+100, :], axis=0)
+# signal = np.mean(data[apex-25:apex+25, :], axis=0)
 
 # nperseg = int(fs * 0.4)
 # noverlap = int(nperseg * 0.98)
@@ -84,3 +81,6 @@ m_imshow(data=data, title='Beamforming Applied', xlabel='Time [s]', ylabel='Spat
 # plt.xticks(np.linspace(t.min(), t.max(), 10))
 # plt.savefig('./plots/spectrogram_beamforming.png', dpi=300)
 # plt.close('all')
+
+# audio_int16 = np.int16(signal * 32767)
+# write("audio_beamformed.wav", int(fs), audio_int16)
