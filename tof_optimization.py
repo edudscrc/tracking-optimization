@@ -16,59 +16,66 @@ def costfun(params, delays):
 
 # Consider r_sensors = 0
 
-# x_sensors = np.linspace(0, 9000, int(9000*4), dtype=float)
+# 7000 metros em 27376 pixels
 x_sensors = np.linspace(0, 7000, 27376, dtype=float)
 
-whales = [
-	{
-		'x': 3950,
-		'r': 500,
-		't0': -0.3,
-	},
-]
-
-real_simulated_delays = [generate_delays(whale['x'], whale['r'], whale['t0'], x_sensors) for whale in whales]
-
-np.save('./real_simulated_delays_seconds.npy', real_simulated_delays[0])
+# Parâmetros da baleia real SIMULADA
+real_simulated_whale = {
+	'x': 4030,
+	'r': 10,
+	't0': 0,
+}
+real_simulated_delays = generate_delays(real_simulated_whale['x'], real_simulated_whale['r'], real_simulated_whale['t0'], x_sensors)
 
 corr_delays = np.load('./delays_px.npy')
 corr_delays = corr_delays / 900.
 corr_delays *= -1.
 
-real_delays = [corr_delays]
+# Grade de busca inicial (resolução de 50m em x e 20m em r)
+# x_search = np.arange(3000, 6000, 50)
+# r_search = np.arange(100, 500, 20)
+# t0_search = np.arange(0, 10, 0.5)
+
+# # Busca bruta para inicialização
+# best_x, best_r, best_t0 = None, None, None
+# best_cost = np.inf
+# for x in x_search:
+# 	for r in r_search:
+# 		for t0 in t0_search:
+# 			cost = costfun((x, r, t0), real_delays)
+# 			if cost < best_cost:
+# 				best_cost = cost
+# 				best_x, best_r, best_t0 = x, r, t0
 
 plt.figure()
-for idx, delay in enumerate(real_delays):
-	plt.plot(x_sensors, real_simulated_delays[idx], label=f'Whale (x={whales[idx]['x']} m, r={whales[idx]['r']} m, t0={whales[idx]['t0']})')
-	plt.plot(x_sensors, delay, label=f'Cross-Correlation Delays')
+plt.plot(x_sensors, real_simulated_delays, label=f'Real Simulated Delays (x={real_simulated_whale['x']} m, r={real_simulated_whale['r']} m, t0={real_simulated_whale['t0']})')
+plt.plot(x_sensors, corr_delays, label=f'Cross-Correlation Delays')
 plt.xlabel('x (sensor position)')
 plt.ylabel('t (time)')
 plt.legend()
 plt.grid(True)
 plt.show()
 
-simulated_whales = [
-	{
-		'x': 4000,
-		'r': 1000,
-		't0_w': 3,
-	},
-]
+initial_guess_whale = {
+	'x': 4000,
+	'r': 300,
+	't0_w': 0.3,
+}
 
-optimize_results = [minimize(costfun, x0=(simulated_whale['x'], simulated_whale['r'], simulated_whale['t0_w']), args=real_delays[idx]) for idx, simulated_whale in enumerate(simulated_whales)]
+optimize_results = minimize(costfun, x0=(initial_guess_whale['x'], initial_guess_whale['r'], initial_guess_whale['t0_w']), args=corr_delays)
+# optimize_results = minimize(costfun, x0=(initial_guess_whale['x'], initial_guess_whale['r'], initial_guess_whale['t0_w']), args=real_simulated_delays)
 
-simulated_delays = [generate_delays(optimize_result.x[0], optimize_result.x[1], optimize_result.x[2], x_sensors) for optimize_result in optimize_results]
+optimized_delays = generate_delays(optimize_results.x[0], optimize_results.x[1], optimize_results.x[2], x_sensors)
 
-for idx, res in enumerate(optimize_results):
-	print(f'Synthetic parameters for whale {idx}:')
-	print(f'x_whale: {res.x[0]:.2f} m')
-	print(f'r_whale: {res.x[1]:.2f} m')
-	print(f't0_whale: {res.x[2]:.2f} s\n')
+print(f'Synthetic parameters calculated (minimize):')
+print(f'x_whale: {optimize_results.x[0]:.2f} m')
+print(f'r_whale: {optimize_results.x[1]:.2f} m')
+print(f't0_whale: {optimize_results.x[2]:.2f} s\n')
 
 # plt.figure()
-# for idx, delay in enumerate(simulated_delays):
-# 	plt.plot(x_sensors, delay, label=f'Whale {idx} (synthetic)')
-# 	plt.plot(x_sensors, real_delays[idx], label=f'Cross-Correlation Delays')
+# plt.plot(x_sensors, optimized_delays, label=f'Synthetic Delays')
+# plt.plot(x_sensors, corr_delays, label=f'Cross-Correlation Delays')
+# # plt.plot(x_sensors, real_simulated_delays, label=f'Real Simulated Delays')
 # plt.xlabel('x (sensor position)')
 # plt.ylabel('t (time)')
 # plt.legend()
