@@ -21,31 +21,15 @@ x_sensors = np.linspace(0, 7000, 27376, dtype=float)
 
 # Parâmetros da baleia real SIMULADA
 real_simulated_whale = {
-	'x': 4030,
-	'r': 10,
-	't0': 0,
+	'x': 4070,
+	'r': 400,
+	't0': -0.38,
 }
 real_simulated_delays = generate_delays(real_simulated_whale['x'], real_simulated_whale['r'], real_simulated_whale['t0'], x_sensors)
 
 corr_delays = np.load('./delays_px.npy')
 corr_delays = corr_delays / 900.
 corr_delays *= -1.
-
-# Grade de busca inicial (resolução de 50m em x e 20m em r)
-# x_search = np.arange(3000, 6000, 50)
-# r_search = np.arange(100, 500, 20)
-# t0_search = np.arange(0, 10, 0.5)
-
-# # Busca bruta para inicialização
-# best_x, best_r, best_t0 = None, None, None
-# best_cost = np.inf
-# for x in x_search:
-# 	for r in r_search:
-# 		for t0 in t0_search:
-# 			cost = costfun((x, r, t0), real_delays)
-# 			if cost < best_cost:
-# 				best_cost = cost
-# 				best_x, best_r, best_t0 = x, r, t0
 
 plt.figure()
 plt.plot(x_sensors, real_simulated_delays, label=f'Real Simulated Delays (x={real_simulated_whale['x']} m, r={real_simulated_whale['r']} m, t0={real_simulated_whale['t0']})')
@@ -57,13 +41,13 @@ plt.grid(True)
 plt.show()
 
 initial_guess_whale = {
-	'x': 4000,
-	'r': 300,
-	't0_w': 0.3,
+	'x': 100,
+	'r': 10,
+	't0_w': 1.,
 }
 
-optimize_results = minimize(costfun, x0=(initial_guess_whale['x'], initial_guess_whale['r'], initial_guess_whale['t0_w']), args=corr_delays)
-# optimize_results = minimize(costfun, x0=(initial_guess_whale['x'], initial_guess_whale['r'], initial_guess_whale['t0_w']), args=real_simulated_delays)
+# optimize_results = minimize(costfun, x0=(initial_guess_whale['x'], initial_guess_whale['r'], initial_guess_whale['t0_w']), args=corr_delays)
+optimize_results = minimize(costfun, x0=(initial_guess_whale['x'], initial_guess_whale['r'], initial_guess_whale['t0_w']), args=real_simulated_delays)
 
 optimized_delays = generate_delays(optimize_results.x[0], optimize_results.x[1], optimize_results.x[2], x_sensors)
 
@@ -72,12 +56,12 @@ print(f'x_whale: {optimize_results.x[0]:.2f} m')
 print(f'r_whale: {optimize_results.x[1]:.2f} m')
 print(f't0_whale: {optimize_results.x[2]:.2f} s\n')
 
-# plt.figure()
-# plt.plot(x_sensors, optimized_delays, label=f'Synthetic Delays')
+plt.figure()
+plt.plot(x_sensors, optimized_delays, label=f'Synthetic Delays')
 # plt.plot(x_sensors, corr_delays, label=f'Cross-Correlation Delays')
-# # plt.plot(x_sensors, real_simulated_delays, label=f'Real Simulated Delays')
-# plt.xlabel('x (sensor position)')
-# plt.ylabel('t (time)')
-# plt.legend()
-# plt.grid(True)
-# plt.show()
+plt.plot(x_sensors, real_simulated_delays, label=f'Real Simulated Delays')
+plt.xlabel('x (sensor position)')
+plt.ylabel('t (time)')
+plt.legend()
+plt.grid(True)
+plt.show()
